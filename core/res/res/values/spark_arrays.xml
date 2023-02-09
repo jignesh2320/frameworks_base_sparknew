@@ -17,6 +17,17 @@
 <resources>
 
    <string-array name="config_certifiedBuildProperties" translatable="false">
+      <!--
+        <item>Build.BRAND</item>
+        <item>Build.MANUFACTURER</item>
+        <item>Build.ID</item>
+        <item>Build.DEVICE</item>
+        <item>Build.PRODUCT</item>
+        <item>Build.MODEL</item>
+        <item>Build.FINGERPRINT</item>
+        <item>Build.TYPE</item>
+        <item>Build.TAGS</item>
+      -->
    </string-array>
 
     <!-- Pocket Mode -->
@@ -39,4 +50,5 @@
 
     <!-- the padding on the top of the statusbar (usually 0) -->
     <dimen name="status_bar_padding_top">0dp</dimen>
+
 </resources>
