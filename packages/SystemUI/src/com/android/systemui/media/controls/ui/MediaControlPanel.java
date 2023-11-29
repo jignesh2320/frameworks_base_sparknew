@@ -289,7 +289,7 @@ public class MediaControlPanel {
 
         private void updateAlwaysOnTime() {
             mAlwaysOnTime = Settings.Secure.getInt(mContext.getContentResolver(),
-                    Settings.Secure.MEDIA_CONTROLS_ALWAYS_SHOW_TIME, 0) == 1;
+                    Settings.Secure.MEDIA_CONTROLS_ALWAYS_SHOW_TIME, 1) == 1;
         }
     }
 
