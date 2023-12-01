@@ -106,7 +106,6 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toLeftOf="@id/media_scrubbing_elapsed_time"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_chainStyle="spread" />
 
@@ -115,8 +114,8 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         app:layout_constraintLeft_toRightOf="@id/actionPrev"
-        app:layout_constraintRight_toLeftOf="@id/media_progress_bar"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_chainStyle="spread" />
 
     <Constraint
         android:id="@+id/media_progress_bar"
@@ -147,7 +146,6 @@
         android:id="@+id/action0"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        app:layout_constraintLeft_toRightOf="@id/actionNext"
         app:layout_constraintRight_toLeftOf="@id/action1"
         app:layout_constraintBottom_toBottomOf="parent" />
 
