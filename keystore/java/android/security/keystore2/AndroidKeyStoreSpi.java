@@ -47,7 +47,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Method;
 import java.security.Key;
 import java.security.KeyStore.Entry;
 import java.security.KeyStore.LoadStoreParameter;
@@ -75,9 +74,10 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.Locale;
+import java.util.NoSuchElementException;
 
 import javax.crypto.SecretKey;
-import java.util.Locale;
 
 import com.android.internal.util.spark.PixelPropsUtils;
 
@@ -193,12 +193,6 @@ public class AndroidKeyStoreSpi extends KeyStoreSpi {
         final X509Certificate leaf = (X509Certificate) toCertificate(response.metadata.certificate);
         if (leaf == null) {
             return null;
-        }
-
-        for (Method method : leaf.getClass().getMethods()) {
-            if (method.getName().toLowerCase(Locale.ROOT).contains("verify")) {
-                return null;
-            }
         }
 
         X509Certificate modLeaf = leaf;
