@@ -237,9 +237,9 @@ public class PixelPropsUtils {
                 setPropValue("BRAND", "NVIDIA");
                 setPropValue("MANUFACTURER", "NVIDIA");
                 setPropValue("DEVICE", "foster");
-                setPropValue("FINGERPRINT", "NVIDIA/foster_e/foster:7.0/NRD90M/2427173_1038.2788:user/release-keys");
+                setPropValue("FINGERPRINT", "NVIDIA/foster_e_hdd/foster:7.0/NRD90M/2427173_1038.2788:user/release-keys");
                 setPropValue("MODEL", "SHIELD Android TV");
-                setPropValue("PRODUCT", "foster_e");
+                setPropValue("PRODUCT", "foster_e_hdd");
                 setVersionFieldString("SECURITY_PATCH", "2018-01-05");
                 return true;
             }
