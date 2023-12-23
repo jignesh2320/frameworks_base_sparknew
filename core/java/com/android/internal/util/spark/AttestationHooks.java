@@ -58,7 +58,7 @@ public final class AttestationHooks {
         "FINGERPRINT", "google/marlin/marlin:10/QP1A.191005.007.A3/5972272:user/release-keys"
     );
 
-    private static final Map<String, Object> sRecentPixelProps = Map.of(
+    private static final Map<String, Object> sPixel8ProProps = Map.of(
         "BRAND", "google",
         "MANUFACTURER", "Google",
         "DEVICE", "husky",
@@ -86,7 +86,7 @@ public final class AttestationHooks {
         }
 
         if (packageName.equals(PACKAGE_GPHOTOS)) {
-            if (!SystemProperties.getBoolean("persist.sys.pixelprops.gphotos", false)) {
+            if (!SystemProperties.getBoolean("persist.sys.pixelprops.gphotos", true)) {
                 dlog("Photos spoofing disabled by system prop");
                 return;
             } else {
@@ -104,7 +104,7 @@ public final class AttestationHooks {
                 setPropValue("MODEL", sNetflixModel);
             } else {
                 dlog("Spoofing Pixel 8 Pro for: " + packageName);
-                sRecentPixelProps.forEach(AttestationHooks::setPropValue);
+                sPixel8ProProps.forEach(AttestationHooks::setPropValue);
             }
         }
     }

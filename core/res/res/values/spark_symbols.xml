@@ -121,6 +121,9 @@
     <java-symbol type="array" name="config_certifiedBuildProperties" />
     <java-symbol type="string" name="config_stockFingerprint" />
 
+    <!-- Whether Pixel props is enabled -->
+    <java-symbol type="bool" name="config_enablePixelProps" />
+
     <!-- SystemUI Restart -->
     <java-symbol type="string" name="systemui_restart_title" />
     <java-symbol type="string" name="systemui_restart_message" />

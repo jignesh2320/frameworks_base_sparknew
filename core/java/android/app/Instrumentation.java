@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2006 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package android.app;
 
 import android.annotation.IntDef;
@@ -43,8 +27,10 @@ import android.os.ServiceManager;
 import android.os.SystemClock;
 import android.os.TestLooperManager;
 import android.os.UserHandle;
+import android.os.UserManager;
 import android.util.AndroidRuntimeException;
 import android.util.Log;
+import android.view.Display;
 import android.view.IWindowManager;
 import android.view.InputDevice;
 import android.view.KeyCharacterMap;
@@ -95,7 +81,9 @@ public class Instrumentation {
 
     private static final String TAG = "Instrumentation";
 
-    private static final long CONNECT_TIMEOUT_MILLIS = 5000;
+    private static final long CONNECT_TIMEOUT_MILLIS = 60_000;
+
+    private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
 
     /**
      * @hide
@@ -394,7 +382,7 @@ public class Instrumentation {
     public void setInTouchMode(boolean inTouch) {
         try {
             IWindowManager.Stub.asInterface(
-                    ServiceManager.getService("window")).setInTouchMode(inTouch);
+                    ServiceManager.getService("window")).setInTouchModeOnAllDisplays(inTouch);
         } catch (RemoteException e) {
             // Shouldn't happen!
         }
@@ -1128,8 +1116,42 @@ public class Instrumentation {
         newEvent.setTime(downTime, eventTime);
         newEvent.setSource(source);
         newEvent.setFlags(event.getFlags() | KeyEvent.FLAG_FROM_SYSTEM);
+        setDisplayIfNeeded(newEvent);
+
         InputManager.getInstance().injectInputEvent(newEvent,
                 InputManager.INJECT_INPUT_EVENT_MODE_WAIT_FOR_FINISH);
+    }
+
+    private void setDisplayIfNeeded(KeyEvent event) {
+        if (!UserManager.isVisibleBackgroundUsersEnabled()) {
+            return;
+        }
+        // In devices that support visible background users visible, the display id must be set to
+        // reflect the display the user was started visible on, otherwise the event would be sent to
+        // the main display (which would most likely fail the test).
+        int eventDisplayId = event.getDisplayId();
+        if (eventDisplayId != Display.INVALID_DISPLAY) {
+            if (VERBOSE) {
+                Log.v(TAG, "setDisplayIfNeeded(" + event + "): not changing display id as it's "
+                        + "explicitly set to " + eventDisplayId);
+            }
+            return;
+        }
+
+        UserManager userManager = mInstrContext.getSystemService(UserManager.class);
+        int userDisplayId = userManager.getMainDisplayIdAssignedToUser();
+        if (VERBOSE) {
+            Log.v(TAG, "setDisplayIfNeeded(" + event + "): eventDisplayId=" + eventDisplayId
+                    + ", user=" + mInstrContext.getUser() + ", userDisplayId=" + userDisplayId);
+        }
+        if (userDisplayId == Display.INVALID_DISPLAY) {
+            Log.e(TAG, "setDisplayIfNeeded(" + event + "): UserManager returned INVALID_DISPLAY as "
+                    + "display assigned to user " + mInstrContext.getUser());
+            return;
+
+        }
+
+        event.setDisplayId(userDisplayId);
     }
 
     /**
@@ -2325,8 +2347,7 @@ public class Instrumentation {
                 return mUiAutomation;
             }
             if (mustCreateNewAutomation) {
-                mUiAutomation = new UiAutomation(getTargetContext().getMainLooper(),
-                        mUiAutomationConnection);
+                mUiAutomation = new UiAutomation(getTargetContext(), mUiAutomationConnection);
             } else {
                 mUiAutomation.disconnect();
             }
@@ -2334,10 +2355,13 @@ public class Instrumentation {
                 mUiAutomation.connect(flags);
                 return mUiAutomation;
             }
+            final long startUptime = SystemClock.uptimeMillis();
             try {
                 mUiAutomation.connectWithTimeout(flags, CONNECT_TIMEOUT_MILLIS);
                 return mUiAutomation;
             } catch (TimeoutException e) {
+                final long waited = SystemClock.uptimeMillis() - startUptime;
+                Log.e(TAG, "Unable to connect to UiAutomation. Waited for " + waited + " ms", e);
                 mUiAutomation.destroy();
                 mUiAutomation = null;
             }
