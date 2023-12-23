@@ -218,11 +218,6 @@ public class PixelPropsUtils {
     public static void spoofBuildGms(Context context) {
         String packageName = "com.goolag.pif";
 
-        if (!Utils.isPackageInstalled(context, packageName)) {
-            Log.e(TAG, "'" + packageName + "' is not installed.");
-            return;
-        }
-
         PackageManager pm = context.getPackageManager();
 
         try {
