@@ -891,10 +891,6 @@ public class ApplicationPackageManager extends PackageManager {
 
     @Override
     public boolean hasSystemFeature(String name, int version) {
-        if (name != null && Arrays.asList(featuresTensor).contains(name) &&
-                !Arrays.asList(pTensorCodenames).contains(SystemProperties.get("ro.product.device"))) {
-            return false;
-        }
         String packageName = ActivityThread.currentPackageName();
         if (packageName != null &&
                 packageName.equals("com.google.android.apps.photos") &&
@@ -902,9 +898,17 @@ public class ApplicationPackageManager extends PackageManager {
             if (Arrays.asList(featuresPixel).contains(name)) return false;
             if (Arrays.asList(featuresPixelOthers).contains(name)) return true;
             if (Arrays.asList(featuresP23).contains(name)) return false;
+            if (Arrays.asList(featuresTensor).contains(name)) return false;
             if (Arrays.asList(featuresNexus).contains(name)) return true;
         }
-        if (Arrays.asList(featuresAndroid).contains(name)) return true;
+        if (Arrays.asList(featuresTensor).contains(name) &&
+                !Arrays.asList(pTensorCodenames).contains(SystemProperties.get("ro.product.device"))) {
+            return false;
+        } else if (packageName != null && Arrays.asList(featuresTensor).contains(name)) {
+            if (packageName.contains("com.google.android.apps.nexuslauncher")) {
+                return false;
+            }
+        }
         if (Arrays.asList(featuresPixel).contains(name)) return true;
         if (Arrays.asList(featuresPixelOthers).contains(name)) return true;
         return mHasSystemFeatureCache.query(new HasSystemFeatureQuery(name, version));
