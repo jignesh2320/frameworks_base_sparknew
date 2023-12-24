@@ -382,7 +382,7 @@ public class Instrumentation {
     public void setInTouchMode(boolean inTouch) {
         try {
             IWindowManager.Stub.asInterface(
-                    ServiceManager.getService("window")).setInTouchModeOnAllDisplays(inTouch);
+                    ServiceManager.getService("window")).setInTouchMode(inTouch);
         } catch (RemoteException e) {
             // Shouldn't happen!
         }
@@ -1116,42 +1116,9 @@ public class Instrumentation {
         newEvent.setTime(downTime, eventTime);
         newEvent.setSource(source);
         newEvent.setFlags(event.getFlags() | KeyEvent.FLAG_FROM_SYSTEM);
-        setDisplayIfNeeded(newEvent);
 
         InputManager.getInstance().injectInputEvent(newEvent,
                 InputManager.INJECT_INPUT_EVENT_MODE_WAIT_FOR_FINISH);
-    }
-
-    private void setDisplayIfNeeded(KeyEvent event) {
-        if (!UserManager.isVisibleBackgroundUsersEnabled()) {
-            return;
-        }
-        // In devices that support visible background users visible, the display id must be set to
-        // reflect the display the user was started visible on, otherwise the event would be sent to
-        // the main display (which would most likely fail the test).
-        int eventDisplayId = event.getDisplayId();
-        if (eventDisplayId != Display.INVALID_DISPLAY) {
-            if (VERBOSE) {
-                Log.v(TAG, "setDisplayIfNeeded(" + event + "): not changing display id as it's "
-                        + "explicitly set to " + eventDisplayId);
-            }
-            return;
-        }
-
-        UserManager userManager = mInstrContext.getSystemService(UserManager.class);
-        int userDisplayId = userManager.getMainDisplayIdAssignedToUser();
-        if (VERBOSE) {
-            Log.v(TAG, "setDisplayIfNeeded(" + event + "): eventDisplayId=" + eventDisplayId
-                    + ", user=" + mInstrContext.getUser() + ", userDisplayId=" + userDisplayId);
-        }
-        if (userDisplayId == Display.INVALID_DISPLAY) {
-            Log.e(TAG, "setDisplayIfNeeded(" + event + "): UserManager returned INVALID_DISPLAY as "
-                    + "display assigned to user " + mInstrContext.getUser());
-            return;
-
-        }
-
-        event.setDisplayId(userDisplayId);
     }
 
     /**
@@ -2347,7 +2314,8 @@ public class Instrumentation {
                 return mUiAutomation;
             }
             if (mustCreateNewAutomation) {
-                mUiAutomation = new UiAutomation(getTargetContext(), mUiAutomationConnection);
+                mUiAutomation = new UiAutomation(getTargetContext().getMainLooper(),
+                        mUiAutomationConnection);
             } else {
                 mUiAutomation.disconnect();
             }
