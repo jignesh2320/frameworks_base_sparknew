@@ -68,6 +68,8 @@ import com.android.internal.util.spark.AttestationHooks;
 import com.android.internal.util.spark.GamesPropsUtils;
 import com.android.internal.util.spark.PixelPropsUtils;
 
+import com.android.internal.util.Utils;
+
 /**
  * Base class for implementing application instrumentation code.  When running
  * with instrumentation turned on, this class will be instantiated for you
@@ -1246,6 +1248,7 @@ public class Instrumentation {
         Application app = getFactory(context.getPackageName())
                 .instantiateApplication(cl, className);
         app.attach(context);
+        Utils.onNewApplication(context);
         AttestationHooks.setProps(context);
         GamesPropsUtils.setProps(context);
         PixelPropsUtils.setProps(context);
@@ -1266,6 +1269,7 @@ public class Instrumentation {
             ClassNotFoundException {
         Application app = (Application)clazz.newInstance();
         app.attach(context);
+        Utils.onNewApplication(context);
         AttestationHooks.setProps(context);
         GamesPropsUtils.setProps(context);
         PixelPropsUtils.setProps(context);
